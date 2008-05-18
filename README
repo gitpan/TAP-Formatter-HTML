@@ -2,6 +2,10 @@ NAME
     TAP::Formatter::HTML - TAP Test Harness output delegate for html output
 
 SYNOPSIS
+     # cmdline usage:
+     % prove -m -Q --formatter=TAP::Formatter::HTML >output.html
+
+     # perl usage:
      use TAP::Harness;
 
      my @tests = glob( 't/*.t' );
@@ -10,7 +14,7 @@ SYNOPSIS
      $harness->runtests( @tests );
      # prints HTML to STDOUT by default
 
-     # or if you don't want STDERR merged in:
+     # or if you really don't want STDERR merged in:
      my $harness = TAP::Harness->new({ formatter_class => 'TAP::Formatter::HTML' });
 
      # to use a custom formatter:
@@ -27,9 +31,52 @@ SYNOPSIS
          ->force_inline_css(0);
 
 DESCRIPTION
-    This provides html output formatting for TAP::Harness.
+    This module provides HTML output formatting for TAP::Harness (a
+    replacement for Test::Harness. It is largely based on ideas from
+    TAP::Test::HTMLMatrix (which was built on Test::Harness and thus had a
+    from a few limitations - hence this module). For sample output, see:
 
-    Documentation is rather sparse at the moment.
+    <http://www.spurkis.org/TAP-Formatter-HTML/test-output.html>
+
+    This module is targeted at all users of automated test suites. It's
+    meant to make reading test results easier, giving you a visual summary
+    of your test suite and letting you drill down into individual failures
+    (which will hopefully make testing more likely to happen at your
+    organization ;-).
+
+    The design goals are:
+
+    *   *easy to use*
+
+        Once you've got your test report, it should be obvious how to use
+        it.
+
+    *   *helpful*
+
+        It should be helpful by pointing out *where* & *why* your test suite
+        is breaking. If you've written your tests well, it should give you
+        enough info to start tracking down the issue.
+
+    *   *easy to install*
+
+        Eg: should be a clean install from CPAN, and you shouldn't need to
+        modify your existing test suite to get up & running, though *you
+        will need to stop using Test::Harness unfortunately*.
+
+    *   *work out of the box*
+
+        You shouldn't need to do any custom-coding to get it working - the
+        default configuration & templates should be enough to get started
+        with. Once installed it should be a matter of running:
+
+         % prove -m -Q --formatter=TAP::Formatter::HTML >output.html
+
+        From your project's home dir, and opening the resulting file.
+
+    *   *easy to configure*
+
+        You should be able to configure & customize it to suit your needs.
+        As such, css, javascript and templates are all configurable.
 
 METHODS
   CONSTRUCTOR
@@ -95,7 +142,7 @@ METHODS
 
       ['file:TAP/Formatter/HTML/jquery-1.2.3.pack.js'];
 
-   inline_css( [] )
+   inline_css( [ $css ] )
     If set, the formatter will include the CSS code in a <style> tag in the
     head of the document.
 
@@ -153,6 +200,14 @@ COPYRIGHT
     This module is released under the same terms as Perl itself.
 
 SEE ALSO
+    Examples in the "examples" directory and here:
+
+    <http://www.spurkis.org/TAP-Formatter-HTML/test-output.html>,
+    <http://www.spurkis.org/TAP-Formatter-HTML/DBD-SQLite-example.html>,
+    <http://www.spurkis.org/TAP-Formatter-HTML/Template-example.html>
+
+    prove - TAP::Harness's new cmdline utility. It's great, use it!
+
     Test::TAP::HTMLMatrix - the inspiration for this module. Many good ideas
     were borrowed from it.
 

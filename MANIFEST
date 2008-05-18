@@ -1,4 +1,3 @@
-bin/runtests_html
 Build.PL
 Changes
 examples/DBD-SQLite-example.html
