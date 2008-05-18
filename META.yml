@@ -1,0 +1,24 @@
+---
+name: TAP-Formatter-HTML
+version: 0.01
+author:
+  - 'Steve Purkis <spurkis@cpan.org>'
+abstract: TAP Test Harness output delegate for html output
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.6.0
+build_requires:
+  Module::Build: 0.20
+  Test::More: 0.01
+provides:
+  TAP::Formatter::HTML:
+    file: lib/TAP/Formatter/HTML.pm
+    version: 0.01
+  TAP::Formatter::HTML::Session:
+    file: lib/TAP/Formatter/HTML/Session.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
