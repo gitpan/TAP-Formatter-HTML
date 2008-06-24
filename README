@@ -150,6 +150,14 @@ METHODS
     If set, the formatter will include the JavaScript code in a <script> tag
     in the head of the document.
 
+   minify( [ $boolean ] )
+    If set, the formatter will attempt to reduce the size of the generated
+    report, they can get pretty big if you're not careful! Defaults to 1
+    (true).
+
+    Note: This currently just means... *remove tabs at start of a line*. It
+    may be extended in the future.
+
    abs_file_paths( [ $ boolean ] )
     If set, the formatter will attempt to convert any relative *file* JS &
     css URI's listed in "css_uris" & "js_uris" to absolute paths. This is
