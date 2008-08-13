@@ -140,7 +140,7 @@ METHODS
     A list of URIs (or strings) to include as external stylesheets in
     <style> tags in the head of the document. Defaults to:
 
-      ['file:TAP/Formatter/HTML/jquery-1.2.3.pack.js'];
+      ['file:TAP/Formatter/HTML/jquery-1.2.6.pack.js'];
 
    inline_css( [ $css ] )
     If set, the formatter will include the CSS code in a <style> tag in the

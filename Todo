@@ -1,13 +1,34 @@
-Give the test suite a title...
 
-More tests!
- * parse the generated output
- * check the view given to the TT view
+Script still running bug
+   * when you navigate away from page
+   * only on big test outputs
+   * jquery cleanup?
+
+Sometimes test details don't collaps properly!
+   * doesn't happen in FireFox 3?
+   * related to the scrollTo?
+   * could hide & show the tr after the slideToggle?
+
+sort by cols
+   * time!
+   * test file
+   * percent
+
+support file output
+   * prove --html=output.html
+   * allow output to STDOUT
+   * write an App::Prove plugin
 
 wrap unknown test output's in <pre>
 
 expand all tests
 expand failed tests
 
-support file output
-   * but how to integrate into prove?
+collapse current test (from halway down big tests, maybe a mouseover file or something)
+
+Give the test suite a title...
+
+More tests!
+ * parse the generated output
+ * check the view given to the TT view
+

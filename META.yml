@@ -1,6 +1,6 @@
 ---
 name: TAP-Formatter-HTML
-version: 0.04
+version: 0.05
 author:
   - 'Steve Purkis <spurkis@cpan.org>'
 abstract: TAP Test Harness output delegate for html output
@@ -19,10 +19,10 @@ build_requires:
 provides:
   TAP::Formatter::HTML:
     file: lib/TAP/Formatter/HTML.pm
-    version: 0.04
+    version: 0.05
   TAP::Formatter::HTML::Session:
     file: lib/TAP/Formatter/HTML/Session.pm
-    version: 0.04
+    version: 0.05
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
