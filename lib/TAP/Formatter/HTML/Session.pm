@@ -19,7 +19,7 @@ use warnings;
 use base qw( TAP::Base );
 use accessors qw( test formatter parser results html_id meta closed );
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 sub _initialize {
     my ($self, $args) = @_;
@@ -136,9 +136,10 @@ sub as_report {
     my ($self) = @_;
     my $p = $self->parser;
     my $r = {
-	    test => $self->test,
-	    results => $self->results,
-	   };
+	     test => $self->test,
+	     html_id => $self->html_id,
+	     results => $self->results,
+	    };
 
     # add parser info:
     for my $key (qw(
