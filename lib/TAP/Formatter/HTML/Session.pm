@@ -19,7 +19,7 @@ use warnings;
 use base qw( TAP::Base );
 use accessors qw( test formatter parser results html_id meta closed );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub _initialize {
     my ($self, $args) = @_;
@@ -254,7 +254,7 @@ Steve Purkis <spurkis@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008 Steve Purkis <spurkis@cpan.org>, S Purkis Consulting Ltd.
+Copyright (c) 2008-2010 Steve Purkis <spurkis@cpan.org>, S Purkis Consulting Ltd.
 All rights reserved.
 
 This module is released under the same terms as Perl itself.

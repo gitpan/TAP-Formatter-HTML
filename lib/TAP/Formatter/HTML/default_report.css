@@ -1,6 +1,6 @@
 /******************************************************************************
  * TAP-Formatter-HTML: default stylesheet for report body
- * Copyright (c) 2008 Steve Purkis.  All rights reserved.
+ * Copyright (c) 2008-2010 Steve Purkis.  All rights reserved.
  * Released under the same terms as Perl itself.
  *****************************************************************************/
 
@@ -13,11 +13,14 @@
 	left: 8px;
 	top: 8px;
 	padding: 2px;
-	width: 100px;
-	height: 26px;
 	font-size: small;
 	background-color: #eeffcc;
 	opacity: 0.5;
+}
+
+#menu ul {
+        margin: 0px;
+        padding: 5px;
 }
 
 #menu li {
@@ -61,7 +64,6 @@
 	text-decoration: none;
 	color: #6666aa;
 }
-
 
 
 /******************************************************************************
@@ -110,6 +112,35 @@ table.detail tr.failed td.file {
 */
 
 /******************************************************************************
+ * Test detail: sortable column headers (requires jquery.tablesort plugin)
+ */
+th.header { 
+}
+
+th.header:after {
+    font-size: 0.6em;
+    content: " ^v";
+}
+
+th.headerSortUp { 
+    background-color: #ffffcc;
+}
+
+th.headerSortUp:after {
+    font-size: 0.6em;
+    content: " /\\";
+}
+
+th.headerSortDown { 
+    background-color: #ffffcc;
+}
+
+th.headerSortDown:after { 
+    font-size: 0.6em;
+    content: " \\/";
+}
+
+/******************************************************************************
  * The file column
  */
 table.detail td.file {
@@ -138,6 +169,13 @@ a.file:visited {
 	color: #3333cc;
 }
 
+div.back-up {
+    position: relative;
+    text-align: center;
+    border: 1px solid grey;
+    width: 100%;
+}
+
 /******************************************************************************
  * The time column
  */
@@ -161,7 +199,7 @@ table.detail td.percent {
 }
 
 /******************************************************************************
- * Colouring the file & percentage columns
+ * Colouring the file + percentage columns
  */
 table.detail tr.percent td.c {
 	padding-left: 2px;

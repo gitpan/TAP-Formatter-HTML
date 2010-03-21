@@ -2,13 +2,20 @@ NAME
     TAP::Formatter::HTML - TAP Test Harness output delegate for html output
 
 SYNOPSIS
-     # cmdline usage:
-     % prove -m -Q --formatter=TAP::Formatter::HTML >output.html
+     ##
+     ## command-line usage (alpha):
+     ##
+     prove -m -Q -P HTML=outfile:out.html,css_uri:style.css,js_uri:foo.js,force_inline_css:0
 
-     # currently in alpha:
-     % prove -PHTML=output.html -m -Q --formatter=TAP::Formatter::HTML
+     # backwards compat usage:
+     prove -m -Q --formatter=TAP::Formatter::HTML >output.html
 
-     # perl usage:
+     # for more detail:
+     perldoc App::Prove::Plugin::HTML
+
+     ##
+     ## perl usage:
+     ##
      use TAP::Harness;
 
      my @tests = glob( 't/*.t' );
@@ -35,7 +42,8 @@ SYNOPSIS
      # you can use your own customized templates too:
      $fmt->template('custom.tt2')
          ->template_processor( Template->new )
-         ->force_inline_css(0);
+         ->force_inline_css(0)
+         ->force_inline_js(0);
 
 DESCRIPTION
     This module provides HTML output formatting for TAP::Harness (a
@@ -255,6 +263,18 @@ METHODS
     You can set this with the "TAP_FORMATTER_HTML_FORCE_INLINE_CSS=0|1"
     environment variable.
 
+   force_inline_js( [ $boolean ] )
+    If set, the formatter will attempt to slurp in any *file* javascript
+    URI's listed in "js_uris", and append them to "inline_js". This is handy
+    if you'll be sending the output around - that way you don't have to send
+    javascript files too.
+
+    Note that including jquery inline doesn't work with some browsers,
+    haven't investigated why. Defaults to *0*.
+
+    You can set this with the "TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1"
+    environment variable.
+
   API METHODS
    summary
       $html = $fmt->summary( $aggregator )
@@ -286,6 +306,7 @@ CUSTOMIZING
 
       TAP_FORMATTER_HTML_OUTFILE=/path/to/file
       TAP_FORMATTER_HTML_FORCE_INLINE_CSS=0|1
+      TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1
       TAP_FORMATTER_HTML_CSS_URIS=/path/to.css:/another/path.css
       TAP_FORMATTER_HTML_JS_URIS=/path/to.js:/another/path.js
       TAP_FORMATTER_HTML_TEMPLATE=/path/to.tt
@@ -328,8 +349,8 @@ AUTHOR
     Steve Purkis <spurkis@cpan.org>
 
 COPYRIGHT
-    Copyright (c) 2008 Steve Purkis <spurkis@cpan.org>, S Purkis Consulting
-    Ltd. All rights reserved.
+    Copyright (c) 2008-2010 Steve Purkis <spurkis@cpan.org>, S Purkis
+    Consulting Ltd. All rights reserved.
 
     This module is released under the same terms as Perl itself.
 
@@ -341,6 +362,8 @@ SEE ALSO
     <http://www.spurkis.org/TAP-Formatter-HTML/Template-example.html>
 
     prove - TAP::Harness's new cmdline utility. It's great, use it!
+
+    App::Prove::Plugin::HTML - the prove interface for this module.
 
     Test::TAP::HTMLMatrix - the inspiration for this module. Many good ideas
     were borrowed from it.

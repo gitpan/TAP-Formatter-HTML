@@ -4,13 +4,20 @@ TAP::Formatter::HTML - TAP Test Harness output delegate for html output
 
 =head1 SYNOPSIS
 
- # cmdline usage:
- % prove -m -Q --formatter=TAP::Formatter::HTML >output.html
+ ##
+ ## command-line usage (alpha):
+ ##
+ prove -m -Q -P HTML=outfile:out.html,css_uri:style.css,js_uri:foo.js,force_inline_css:0
 
- # currently in alpha:
- % prove -PHTML=output.html -m -Q --formatter=TAP::Formatter::HTML
+ # backwards compat usage:
+ prove -m -Q --formatter=TAP::Formatter::HTML >output.html
 
- # perl usage:
+ # for more detail:
+ perldoc App::Prove::Plugin::HTML
+
+ ##
+ ## perl usage:
+ ##
  use TAP::Harness;
 
  my @tests = glob( 't/*.t' );
@@ -37,7 +44,8 @@ TAP::Formatter::HTML - TAP Test Harness output delegate for html output
  # you can use your own customized templates too:
  $fmt->template('custom.tt2')
      ->template_processor( Template->new )
-     ->force_inline_css(0);
+     ->force_inline_css(0)
+     ->force_inline_js(0);
 
 =cut
 
@@ -62,11 +70,12 @@ use TAP::Formatter::HTML::Session;
 use base qw( TAP::Base );
 use accessors qw( verbosity stdout output_fh escape_output tests session_class sessions
 		  template_processor template html html_id_iterator minify
-		  css_uris js_uris inline_css inline_js abs_file_paths force_inline_css );
+		  css_uris js_uris inline_css inline_js abs_file_paths force_inline_css force_inline_js );
 
 use constant default_session_class => 'TAP::Formatter::HTML::Session';
 use constant default_template      => 'TAP/Formatter/HTML/default_report.tt2';
-use constant default_js_uris       => ['file:TAP/Formatter/HTML/jquery-1.2.6.pack.js',
+use constant default_js_uris       => ['file:TAP/Formatter/HTML/jquery-1.4.2.min.js',
+				       'file:TAP/Formatter/HTML/jquery.tablesorter-2.0.3.min.js',
 				       'file:TAP/Formatter/HTML/default_report.js'];
 use constant default_css_uris      => ['file:TAP/Formatter/HTML/default_page.css',
 				       'file:TAP/Formatter/HTML/default_report.css'];
@@ -93,7 +102,7 @@ use constant severity_map => {
 			      5 => 'very-high',
 			     };
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $FAKE_WIN32_URIS = 0; # for testing only
 
 sub _initialize {
@@ -113,6 +122,7 @@ sub _initialize {
          ->abs_file_paths( 1 )
          ->abs_file_paths( 1 )
          ->force_inline_css( 1 )
+         ->force_inline_js( 0 )
          ->session_class( $self->default_session_class )
          ->template_processor( $self->default_template_processor )
          ->template( $self->default_template )
@@ -142,9 +152,14 @@ sub check_for_overrides_in_env {
 	$self->output_file( $file );
     }
 
-    my $force = $ENV{TAP_FORMATTER_HTML_FORCE_INLINE_CSS};
-    if (defined( $force )) {
-	$self->force_inline_css( $force );
+    my $force_css = $ENV{TAP_FORMATTER_HTML_FORCE_INLINE_CSS};
+    if (defined( $force_css )) {
+	$self->force_inline_css( $force_css );
+    }
+
+    my $force_js = $ENV{TAP_FORMATTER_HTML_FORCE_INLINE_JS};
+    if (defined( $force_js )) {
+	$self->force_inline_js( $force_js );
     }
 
     if (my $uris = $ENV{TAP_FORMATTER_HTML_CSS_URIS}) {
@@ -259,6 +274,7 @@ sub generate_report {
 
     $self->check_uris;
     $self->slurp_css if $self->force_inline_css;
+    $self->slurp_js if $self->force_inline_js;
 
     my $params = {
 		  report => $r,
@@ -411,15 +427,40 @@ sub slurp_css {
     my ($self) = shift;
     $self->info("slurping css files inline");
 
-    my $inline_css = $self->inline_css || '';
-    foreach my $uri (@{ $self->css_uris }) {
+    my $inline_css = '';
+    $self->_slurp_uris( $self->css_uris, \$inline_css );
+
+    # append any inline css so it gets interpreted last:
+    $inline_css .= "\n" . $self->inline_css if $self->inline_css;
+
+    $self->inline_css( $inline_css );
+}
+
+sub slurp_js {
+    my ($self) = shift;
+    $self->info("slurping js files inline");
+
+    my $inline_js = '';
+    $self->_slurp_uris( $self->js_uris, \$inline_js );
+
+    # append any inline js so it gets interpreted last:
+    $inline_js .= "\n" . $self->inline_js if $self->inline_js;
+
+    $self->inline_js( $inline_js );
+}
+
+sub _slurp_uris {
+    my ($self, $uris, $slurp_to_ref) = @_;
+
+    foreach my $uri (@$uris) {
 	my $scheme = $uri->scheme;
 	if ($scheme && $scheme eq 'file') {
 	    my $path = $uri->path;
 	    if (-e $path) {
 		if (open my $fh, $path) {
 		    local $/ = undef;
-		    $inline_css .= <$fh>;
+		    $$slurp_to_ref .= <$fh>;
+		    $$slurp_to_ref .= "\n";
 		} else {
 		    $self->log("Warning: couldn't open $path: $!");
 		}
@@ -431,8 +472,10 @@ sub slurp_css {
 	}
     }
 
-    $self->inline_css( $inline_css );
+    return $slurp_to_ref;
 }
+
+
 
 sub log {
     my $self = shift;
@@ -729,6 +772,18 @@ Defaults to I<1>.
 You can set this with the C<TAP_FORMATTER_HTML_FORCE_INLINE_CSS=0|1> environment
 variable.
 
+=head3 force_inline_js( [ $boolean ] )
+
+If set, the formatter will attempt to slurp in any I<file> javascript URI's listed in
+L</js_uris>, and append them to L</inline_js>.  This is handy if you'll be
+sending the output around - that way you don't have to send javascript files too.
+
+Note that including jquery inline doesn't work with some browsers, haven't
+investigated why.  Defaults to I<0>.
+
+You can set this with the C<TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1> environment
+variable.
+
 =head2 API METHODS
 
 =head3 summary
@@ -763,6 +818,7 @@ You can use environment variables to customize the behaviour of TFH:
 
   TAP_FORMATTER_HTML_OUTFILE=/path/to/file
   TAP_FORMATTER_HTML_FORCE_INLINE_CSS=0|1
+  TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1
   TAP_FORMATTER_HTML_CSS_URIS=/path/to.css:/another/path.css
   TAP_FORMATTER_HTML_JS_URIS=/path/to.js:/another/path.js
   TAP_FORMATTER_HTML_TEMPLATE=/path/to.tt
@@ -808,7 +864,7 @@ Steve Purkis <spurkis@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008 Steve Purkis <spurkis@cpan.org>, S Purkis Consulting Ltd.
+Copyright (c) 2008-2010 Steve Purkis <spurkis@cpan.org>, S Purkis Consulting Ltd.
 All rights reserved.
 
 This module is released under the same terms as Perl itself.
@@ -822,6 +878,8 @@ L<http://www.spurkis.org/TAP-Formatter-HTML/DBD-SQLite-example.html>,
 L<http://www.spurkis.org/TAP-Formatter-HTML/Template-example.html>
 
 L<prove> - L<TAP::Harness>'s new cmdline utility.  It's great, use it!
+
+L<App::Prove::Plugin::HTML> - the prove interface for this module.
 
 L<Test::TAP::HTMLMatrix> - the inspiration for this module.  Many good ideas
 were borrowed from it.
