@@ -182,7 +182,11 @@ METHODS
 
       COMPILE_DIR  => catdir( tempdir(), 'TAP-Formatter-HTML' ),
       COMPILE_EXT  => '.ttc',
-      INCLUDE_PATH => join(':', @INC),
+      INCLUDE_PATH => parent directory TAP::Formatter::HTML was loaded from
+
+    Note: INCLUDE_PATH used to be set to: "join(':', @INC)" but this was
+    causing issues on systems with > 64 dirs in @INC. See RT #74364 for
+    details.
 
    template
       $fmt->template( [ $file_name ] )
@@ -275,6 +279,10 @@ METHODS
     You can set this with the "TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1"
     environment variable.
 
+   color
+    This method is for "TAP::Harness" API compatibility only. It does
+    nothing.
+
   API METHODS
    summary
       $html = $fmt->summary( $aggregator )
@@ -343,13 +351,18 @@ WIN32 URIS
     URI instead.
 
 BUGS
-    Please use http://rt.cpan.org to report any issues.
+    Please use http://rt.cpan.org to report any issues. Patches are welcome.
+
+CONTRIBUTING
+    Use github:
+
+    <https://github.com/spurkis/TAP-Formatter-HTML>
 
 AUTHOR
     Steve Purkis <spurkis@cpan.org>
 
 COPYRIGHT
-    Copyright (c) 2008-2010 Steve Purkis <spurkis@cpan.org>, S Purkis
+    Copyright (c) 2008-2012 Steve Purkis <spurkis@cpan.org>, S Purkis
     Consulting Ltd. All rights reserved.
 
     This module is released under the same terms as Perl itself.

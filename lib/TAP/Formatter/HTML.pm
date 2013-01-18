@@ -69,7 +69,7 @@ use TAP::Formatter::HTML::Session;
 
 use base qw( TAP::Base );
 use accessors qw( verbosity stdout output_fh escape_output tests session_class sessions
-		  template_processor template html html_id_iterator minify
+		  template_processor template html html_id_iterator minify color
 		  css_uris js_uris inline_css inline_js abs_file_paths force_inline_css force_inline_js );
 
 use constant default_session_class => 'TAP::Formatter::HTML::Session';
@@ -79,13 +79,6 @@ use constant default_js_uris       => ['file:TAP/Formatter/HTML/jquery-1.4.2.min
 				       'file:TAP/Formatter/HTML/default_report.js'];
 use constant default_css_uris      => ['file:TAP/Formatter/HTML/default_page.css',
 				       'file:TAP/Formatter/HTML/default_report.css'];
-use constant default_template_processor =>
-  Template->new(
-		# arguably shouldn't compile as this is only used once
-		COMPILE_DIR  => catdir( tempdir( CLEANUP => 1 ), 'TAP-Formatter-HTML' ),
-		COMPILE_EXT  => '.ttc',
-		INCLUDE_PATH => join(':', @INC),
-	       );
 
 use constant severity_map => {
 			      ''          => 0,
@@ -102,7 +95,7 @@ use constant severity_map => {
 			      5 => 'very-high',
 			     };
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $FAKE_WIN32_URIS = 0; # for testing only
 
 sub _initialize {
@@ -178,6 +171,18 @@ sub check_for_overrides_in_env {
 
     return $self;
 }
+
+sub default_template_processor {
+    my $path = __FILE__;
+    $path =~ s/.TAP.Formatter.HTML.pm$//;
+    return Template->new(
+        # arguably shouldn't compile as this is only used once
+        COMPILE_DIR  => catdir( tempdir( CLEANUP => 1 ), 'TAP-Formatter-HTML' ),
+        COMPILE_EXT  => '.ttc',
+        INCLUDE_PATH => $path,
+    );
+}
+
 
 sub output_file {
     my ($self, $file) = @_;
@@ -684,7 +689,10 @@ Defaults to a TT2 L<Template> processor with the following config:
 
   COMPILE_DIR  => catdir( tempdir(), 'TAP-Formatter-HTML' ),
   COMPILE_EXT  => '.ttc',
-  INCLUDE_PATH => join(':', @INC),
+  INCLUDE_PATH => parent directory TAP::Formatter::HTML was loaded from
+
+Note: INCLUDE_PATH used to be set to: C<join(':', @INC)> but this was causing
+issues on systems with > 64 dirs in C<@INC>.  See RT #74364 for details.
 
 =head3 template
 
@@ -784,6 +792,10 @@ investigated why.  Defaults to I<0>.
 You can set this with the C<TAP_FORMATTER_HTML_FORCE_INLINE_JS=0|1> environment
 variable.
 
+=head3 color
+
+This method is for C<TAP::Harness> API compatibility only.  It does nothing.
+
 =head2 API METHODS
 
 =head3 summary
@@ -856,7 +868,13 @@ If it doesn't work for you, you can always construct a valid File URI instead.
 
 =head1 BUGS
 
-Please use http://rt.cpan.org to report any issues.
+Please use http://rt.cpan.org to report any issues.  Patches are welcome.
+
+=head1 CONTRIBUTING
+
+Use github:
+
+L<https://github.com/spurkis/TAP-Formatter-HTML>
 
 =head1 AUTHOR
 
@@ -864,7 +882,7 @@ Steve Purkis <spurkis@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2010 Steve Purkis <spurkis@cpan.org>, S Purkis Consulting Ltd.
+Copyright (c) 2008-2012 Steve Purkis <spurkis@cpan.org>, S Purkis Consulting Ltd.
 All rights reserved.
 
 This module is released under the same terms as Perl itself.

@@ -44,3 +44,4 @@ t/lib/FileTempTFH.pm
 t/selenium/server.pl
 t/selenium_basic.t
 Todo
+META.json
